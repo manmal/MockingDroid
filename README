@@ -1,6 +1,7 @@
 MockingDroid is a VERY SMALL template app for interactive mockups on Android, for performing usability tests and getting a feeling of how well your UI ideas work out.
 It works by presenting HTML files which are present in the assets folder (or alternatively, online), which can
 be structured like ordinary HTML, including hyperlinks, stylesheets, images,...
+Additionally, some file-naming conventions are defined to enable screen transitions on menu and search button presses.
 
 Features:
 - You stay in full control of your mockups - use plain HTML.
@@ -21,7 +22,10 @@ Usage Instructions:
 4. If you use any online HTML resources, add permission "android.permission.INTERNET" to AndroidManifest.xml
 5. Run (tested only at API Level 8 [Android 2.2])
 
-Not yet implemented:
-- Menu button functionality (e.g. by loading corresponding file xy_menu.html, if the current view is xy.html)
+Menu & Search Button implementation:
+- For a HTML file to support a transition to a menu or search file, extra files have to exist:
+	- filename.menu.html and filename.search.html
+	- these suffixes can be configured in /res/values/settings.xml
+- If a menu or search screen file is not found (or no HTTP-OK is received from WWW servers), the button press is simply ignored.
 
 Please fork this project! I'd also be happy to receive suggestions or pull requests.

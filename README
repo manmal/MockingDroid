@@ -1,0 +1,28 @@
+What is MockingDroid?
+MockingDroid is a VERY SMALL template app for interactive mockups on Android, for performing usability tests and getting a feeling of how well your UI ideas work out.
+It works by presenting HTML files which are present in the assets folder (or alternatively, online), which can
+be structured like ordinary HTML, including hyperlinks, stylesheets, images,...
+
+Features:
+- You stay in full control of your mockups - use plain HTML.
+- Screen-resolution independent - scaling happens automatically via the WebView's zoom factor (as long as all pages are same width, have a look at Requirements).
+- Back-button works; if user has reached start.html, the backbutton exits the application, as expected.
+- Resuming the app after passivation works as expected, returning to the last viewed screen
+
+Requirements:
+- "start.html" must be present in the project's assets folder - this is the first screen a user sees upon starting the app;
+alternatively, you can set another path in /res/values/settings.xml
+- The setting mockups_width in /res/values/settings.xml (default at 400px) should equal the width of all mockup pages (have a look at the two sample pages, where image width is set to 400px via style.css).
+
+Usage Instructions:
+1. Clone source into a directory
+1.b. Get the Android SDK and Tools
+2. Copy your mockup's HTML structure into /assets (have a look at the sample files there).
+3. Adjust settings /res/values/settings.xml - set the standard page width of your mockups (usually the width of images, can also be a scaled size set in CSS), and the path to the starting page.
+4. If you use any online HTML resources, add permission "android.permission.INTERNET" to AndroidManifest.xml
+5. Run (tested only at API Level 8 [Android 2.2])
+
+Not yet implemented:
+- Menu button functionality (e.g. by loading corresponding file xy_menu.html, if the current view is xy.html)
+
+Please fork this project! I'd also be happy to receive suggestions or pull requests.

@@ -2,4 +2,6 @@
 <resources>
     <integer name="mockups_width">400</integer>
     <string name="start_page">file:///android_asset/start.html</string>
+<string name="filesuffix_menu">.menu</string>
+<string name="filesuffix_search">.search</string>
 </resources>

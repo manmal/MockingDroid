@@ -1,4 +1,3 @@
-What is MockingDroid?
 MockingDroid is a VERY SMALL template app for interactive mockups on Android, for performing usability tests and getting a feeling of how well your UI ideas work out.
 It works by presenting HTML files which are present in the assets folder (or alternatively, online), which can
 be structured like ordinary HTML, including hyperlinks, stylesheets, images,...

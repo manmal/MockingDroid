@@ -6,7 +6,7 @@ Additionally, some file-naming conventions are defined to enable screen transiti
 Features:
 - You stay in full control of your mockups - use plain HTML.
 - Screen-resolution independent - scaling happens automatically via the WebView's zoom factor (as long as all pages are same width, have a look at Requirements).
-- All conventional hardware button works; if user has reached start.html, the backbutton exits the application, as expected. Menu and search buttons work if files with the corresponding names are present (look below).
+- All conventional hardware button work; if the user presses back on the first page, this exits the application, as expected. Menu and search buttons work if files with the corresponding names are present (look below).
 - Resuming the app after passivation works as expected, returning to the last viewed screen
 
 Requirements:
@@ -15,17 +15,16 @@ alternatively, you can set another path in /res/values/settings.xml
 - The setting mockups_width in /res/values/settings.xml (default at 400px) should equal the width of all mockup pages (have a look at the two sample pages, where image width is set to 400px via style.css).
 
 Usage Instructions:
+0. Get the Android SDK and Tools, or just try out with the demo app in Downloads.
 1. Clone source into a directory
-1.b. Get the Android SDK and Tools
-2. Copy your mockup's HTML structure into /assets (have a look at the sample files there).
-3. Adjust settings /res/values/settings.xml - set the standard page width of your mockups (usually the width of images, can also be a scaled size set in CSS), and the path to the starting page.
-4. If you use any online HTML resources, add permission "android.permission.INTERNET" to AndroidManifest.xml
-5. Run (tested only at API Level 8 [Android 2.2])
+2. Copy your mockup's HTML structure into /assets (have a look at the sample files there), if you want to use local files.
+3. Adjust settings /res/values/settings.xml - set the standard page width of your mockups (usually the width of images, can also be a scaled size set in CSS), and the path to the starting page (local or online).
+4. Run (tested only at API Level 8 [Android 2.2])
 
 Menu & Search Button implementation:
 - For a HTML file to support a transition to a menu or search file, extra files have to exist:
 	- filename.menu.html and filename.search.html
 	- these suffixes can be configured in /res/values/settings.xml
-- If a menu or search screen file is not found (or no HTTP-OK is received from WWW servers), the button press is simply ignored.
+- If a menu or search screen file is not found (or no HTTP-OK is received from remote server), the button press is simply ignored.
 
 Please fork this project! I'd also be happy to receive suggestions or pull requests.

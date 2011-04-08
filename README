@@ -6,7 +6,7 @@ Additionally, some file-naming conventions are defined to enable screen transiti
 Features:
 - You stay in full control of your mockups - use plain HTML.
 - Screen-resolution independent - scaling happens automatically via the WebView's zoom factor (as long as all pages are same width, have a look at Requirements).
-- Back-button works; if user has reached start.html, the backbutton exits the application, as expected.
+- All conventional hardware button works; if user has reached start.html, the backbutton exits the application, as expected. Menu and search buttons work if files with the corresponding names are present (look below).
 - Resuming the app after passivation works as expected, returning to the last viewed screen
 
 Requirements:

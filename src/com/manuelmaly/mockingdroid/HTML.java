@@ -21,6 +21,7 @@ public class HTML extends Activity {
 	WebView webview;
 	boolean backButtonGloballyAllowed;
 	boolean currentPageBackButtonAllowed = true;
+	String currentPageBackButtonAdvice;
 	private Handler mHandler = new Handler();
 
 	/** Called when the activity is first created. */
@@ -45,8 +46,10 @@ public class HTML extends Activity {
 		if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
 			if (backButtonGloballyAllowed) {
 				// if user is at the start page, back button always works:
-				if (webview.getUrl().equals(getResources().getString(R.string.start_page)) || currentPageBackButtonAllowed)
+				if (webview.getUrl().equals(getResources().getString(R.string.start_page)) || currentPageBackButtonAllowed) {
 					webview.goBack();
+				}
+					
 			}
 			return true;
 		}
@@ -86,6 +89,7 @@ public class HTML extends Activity {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 			currentPageBackButtonAllowed = true;
+			currentPageBackButtonAdvice = null;
 			view.loadUrl(url);
 			return true;
 		}

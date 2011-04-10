@@ -30,14 +30,14 @@ Usage Instructions
  3. Adjust settings /res/values/settings.xml - set the standard page width of your mockups (usually the width of images, can also be a scaled size set in CSS), and the path to the starting page (local or online). Back-button support can globally be switched off by setting a number of <= 0, or enabled by providing a number >= 1. The filename-conventions (suffixes) for HTML files for menu and search screens can also be adjusted here.
  4. Run (tested only at API Level 8 [Android 2.2])
 
-### Menu & Search Button implementation:
+### Menu & Search Button usage:
  * For a HTML file to support a transition to a menu or search file, extra files have to exist:
-	  * filename.menu.html and/or filename.search.html
+	  * filename.menu.html and/or filename.search.html, which contain the screen with menu/search additions
 	  * these suffixes can be configured in /res/values/settings.xml
- * If a menu or search screen file is not found (or no HTTP-OK is received from remote server), the button press is simply ignored.
+ * If a menu or search screen file is not found (or no HTTP-OK is received from remote server), the button-press is simply ignored.
 
-### Back Button implementation:
- * The back button can be enabled or disabled globally (look at Usage Instructions).
+### Back Button usage:
+ * The back button can be enabled or disabled globally (/res/values/settings.xml).
  * If globally enabled, back button support can be switched off per HTML file, by putting "nobackbutton" ANYWHERE in the file. E.g. using a hidden span with a class "nobackbutton" will be fine.
 
 Care to Contribute?

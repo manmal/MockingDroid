@@ -14,42 +14,57 @@ import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
+
+import com.manuelmaly.mockingdroid.monitor.WebViewMonitor;
 
 public class HTML extends Activity {
 
-	WebView webview;
-	boolean backButtonGloballyAllowed;
+    WebView webview;
+    WebViewMonitor monitor;
+
+    boolean backButtonGloballyAllowed;
 	boolean currentPageBackButtonAllowed = true;
 	private Handler mHandler = new Handler();
-
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		backButtonGloballyAllowed = getResources().getInteger(R.integer.backbutton_enabled) > 0;
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		String startUrl = getResources().getString(R.string.start_page);
 		webview = new WebView(this);
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.setVerticalScrollBarEnabled(false);
 		webview.setHorizontalScrollBarEnabled(false);
 		webview.setPadding(0, 0, 0, 0);
 		webview.addJavascriptInterface(new JavaScriptInterface(), "BACKBUTTONSTATUS");
-		webview.setWebViewClient(new UserActionInterceptor());
-		webview.loadUrl(getResources().getString(R.string.start_page));
+		webview.loadUrl(startUrl);
+		this.monitor = new WebViewMonitor(this, startUrl);
+		webview.setWebViewClient(this.monitor);
 		setContentView(webview);
 		webview.setInitialScale(getScale());
+	}
+	
+	public void setCurrentPageBackButtonAllowed(boolean allowed) {
+	    this.currentPageBackButtonAllowed = allowed;
 	}
 
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
 			if (backButtonGloballyAllowed) {
 				// if user is at the start page, back button always works:
-				if (webview.getUrl().equals(getResources().getString(R.string.start_page)) || currentPageBackButtonAllowed)
+				if (webview.getUrl().equals(getResources().getString(R.string.start_page)) || currentPageBackButtonAllowed) {
 					webview.goBack();
+					this.monitor.backButtonPressed(webview.getUrl());
+					}
 			}
 			return true;
+		} else if ((keyCode == KeyEvent.KEYCODE_BACK) && !webview.canGoBack()){
+		    //on quit application..
+		    //getMetrics here...
 		}
+		
 		if ((keyCode == KeyEvent.KEYCODE_MENU)) {
 			URL menuURL = getMenuScreenURL();
 			if (menuURL != null)
@@ -79,26 +94,6 @@ public class HTML extends Activity {
 					HTML.this.currentPageBackButtonAllowed = match.length() == 0;
 				}
 			});
-		}
-	}
-
-	private class UserActionInterceptor extends WebViewClient {
-		@Override
-		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			currentPageBackButtonAllowed = true;
-			view.loadUrl(url);
-			return true;
-		}
-
-		/**
-		 * When page loading is finished, call this object via the JS interface to determine if 
-		 * backbutton-support is enabled or disabled for this HTML file. ("nobackbutton" must be present anywhere).
-		 */
-		@Override
-		public void onPageFinished(WebView view, String url) {
-			view.loadUrl("javascript:function callHome(n){window.BACKBUTTONSTATUS.setBackButtonStatus(n)};" +
-					"var f = document.getElementsByTagName('html')[0].innerHTML.match(/nobackbutton/); " +
-					"f == null ? callHome('') : callHome(f[0]);");
 		}
 	}
 

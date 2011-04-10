@@ -20,10 +20,7 @@ import com.manuelmaly.mockingdroid.monitor.WebViewMonitor;
 public class HTML extends Activity {
 
 	WebView webview;
-	boolean backButtonGloballyAllowed;
-	boolean currentPageBackButtonAllowed = true;
-	String currentPageBackButtonAdvice;
-	private Handler mHandler = new Handler();
+	WebViewMonitor monitor;
 
     boolean backButtonGloballyAllowed;
     boolean currentPageBackButtonAllowed = true;

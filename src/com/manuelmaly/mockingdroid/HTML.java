@@ -8,6 +8,7 @@ import java.net.URL;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Window;
@@ -18,25 +19,35 @@ import android.webkit.WebViewClient;
 public class HTML extends Activity {
 
 	WebView webview;
+	boolean backButtonGloballyAllowed;
+	boolean currentPageBackButtonAllowed = true;
+	private Handler mHandler = new Handler();
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		backButtonGloballyAllowed = getResources().getInteger(R.integer.backbutton_enabled) > 0;
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		webview = new WebView(this);
-		webview.loadUrl(getResources().getString(R.string.start_page));
+		webview.getSettings().setJavaScriptEnabled(true);
 		webview.setVerticalScrollBarEnabled(false);
 		webview.setHorizontalScrollBarEnabled(false);
 		webview.setPadding(0, 0, 0, 0);
+		webview.addJavascriptInterface(new JavaScriptInterface(), "BACKBUTTONSTATUS");
 		webview.setWebViewClient(new UserActionInterceptor());
+		webview.loadUrl(getResources().getString(R.string.start_page));
 		setContentView(webview);
 		webview.setInitialScale(getScale());
 	}
 
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
-			webview.goBack();
+			if (backButtonGloballyAllowed) {
+				// if user is at the start page, back button always works:
+				if (webview.getUrl().equals(getResources().getString(R.string.start_page)) || currentPageBackButtonAllowed)
+					webview.goBack();
+			}
 			return true;
 		}
 		if ((keyCode == KeyEvent.KEYCODE_MENU)) {
@@ -55,11 +66,39 @@ public class HTML extends Activity {
 		return super.onKeyDown(keyCode, event);
 	}
 
+	private class JavaScriptInterface {
+		/**
+		 * Gets called by JS within the currently displayed HTML file, to enable
+		 * files control of backbutton-support.
+		 * @param match
+		 */
+		@SuppressWarnings("unused")
+		public void setBackButtonStatus(final String match) {
+			mHandler.post(new Runnable() {
+				public void run() {
+					HTML.this.currentPageBackButtonAllowed = match.length() == 0;
+				}
+			});
+		}
+	}
+
 	private class UserActionInterceptor extends WebViewClient {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
+			currentPageBackButtonAllowed = true;
 			view.loadUrl(url);
 			return true;
+		}
+
+		/**
+		 * When page loading is finished, call this object via the JS interface to determine if 
+		 * backbutton-support is enabled or disabled for this HTML file. ("nobackbutton" must be present anywhere).
+		 */
+		@Override
+		public void onPageFinished(WebView view, String url) {
+			view.loadUrl("javascript:function callHome(n){window.BACKBUTTONSTATUS.setBackButtonStatus(n)};" +
+					"var f = document.getElementsByTagName('html')[0].innerHTML.match(/nobackbutton/); " +
+					"f == null ? callHome('') : callHome(f[0]);");
 		}
 	}
 
@@ -86,14 +125,16 @@ public class HTML extends Activity {
 			String menuFileName = null;
 
 			// Is this already a special screen? If yes, return to the original
-			// screen (remove suffixes); if there is a suffix, but it's another one
-			// (e.g. start.menu.html and suffix ".search" is requested), drop the old suffix:
+			// screen (remove suffixes); if there is a suffix, but it's another
+			// one
+			// (e.g. start.menu.html and suffix ".search" is requested), drop
+			// the old suffix:
 			String suffixMenu = getResources().getString(R.string.filesuffix_menu);
 			String suffixSearch = getResources().getString(R.string.filesuffix_search);
-			String[] suffixesToLookFor = new String[]{suffixMenu, suffixSearch};
-			for(String curSuffix : suffixesToLookFor) {
+			String[] suffixesToLookFor = new String[] { suffixMenu, suffixSearch };
+			for (String curSuffix : suffixesToLookFor) {
 				if (fileName.indexOf(curSuffix) > -1) {
-					if (suffix.equals(curSuffix)) 
+					if (suffix.equals(curSuffix))
 						return createURLWithFilename(cURL, fileName.replace(curSuffix, ""));
 					else
 						fileName = fileName.replace(curSuffix, "");

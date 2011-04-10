@@ -11,8 +11,8 @@ Features
 
  * You stay in full control of your mockups - use plain HTML.
  * Screen-resolution independent - scaling happens automatically via the WebView's zoom factor (as long as all pages are same width, have a look at Requirements).
- * All conventional hardware button work; if the user presses back on the first page, this exits the application, as expected. Menu and search buttons work if files with the corresponding names are present (look below). Back-button support can be globally disabled, or enabled and selectively switched off per HTML file (look below).
- * Resuming the app after passivation works as expected, returning to the last viewed screen
+ * All conventional hardware buttons work; if the user presses back on the first page, this exits the application, as expected. Menu and search buttons work if files with the corresponding names are present (look below). Back-button support can be globally disabled, or globally enabled and selectively switched off per HTML file (look below).
+ * Resuming the app after passivation works as expected, returning to the last viewed screen.
 
 Requirements
 ------------
@@ -32,8 +32,8 @@ Usage Instructions
 
 ### Menu & Search Button implementation:
  * For a HTML file to support a transition to a menu or search file, extra files have to exist:
-  * filename.menu.html and/or filename.search.html
-  * these suffixes can be configured in /res/values/settings.xml
+	  * filename.menu.html and/or filename.search.html
+	  * these suffixes can be configured in /res/values/settings.xml
  * If a menu or search screen file is not found (or no HTTP-OK is received from remote server), the button press is simply ignored.
 
 ### Back Button implementation:

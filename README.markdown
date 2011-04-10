@@ -6,20 +6,22 @@ It works by presenting HTML files which are present in the assets folder (or alt
 be structured like ordinary HTML, including hyperlinks, stylesheets, images,...
 Additionally, some file-naming conventions are defined to enable screen transitions on menu and search button presses.
 
+You can view MockingDroid as a highly restricted web browser on UI-mockup-steroids.
+
 Features
 --------
 
  * You stay in full control of your mockups - use plain HTML.
  * Screen-resolution independent - scaling happens automatically via the WebView's zoom factor (as long as all pages are same width, have a look at Requirements).
- * All conventional hardware buttons work; if the user presses back on the first page, this exits the application, as expected. Menu and search buttons work if files with the corresponding names are present (look below). Back-button support can be globally disabled, or globally enabled and selectively switched off per HTML file (look below).
+ * All conventional hardware buttons work; Menu and search buttons work if files with the corresponding names are present (look below). Back-button support can be globally disabled, or globally enabled and selectively switched off per HTML file (look below).
  * Resuming the app after passivation works as expected, returning to the last viewed screen.
 
 Requirements
 ------------
 
- * "start.html" must be present in the project's assets folder - this is the first screen a user sees upon starting the app;
-alternatively, you can set another path in /res/values/settings.xml
- * The setting mockups_width in /res/values/settings.xml (default at 400px) should equal the width of all mockup pages (have a look at the two sample pages, where image width is set to 400px via style.css).
+ * "start.html" must be present in the project's /assets folder - this is the first screen a user sees upon starting the app. 
+Alternatively, you can customize the start page path in /res/values/settings.xml (online pages allowed).
+ * The setting mockups_width in /res/values/settings.xml (default at 400px) should equal the width of all mockup pages (have a look at the sample pages, where image width is set to 400px via style.css).
 
 Usage Instructions
 ------------------

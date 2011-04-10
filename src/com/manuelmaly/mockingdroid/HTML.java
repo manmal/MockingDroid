@@ -61,9 +61,9 @@ public class HTML extends Activity {
 			// on quit application..
 			// getMetrics here...
 			System.out.println("com.manuelmaly.mockingdroid.monitor: " + this.monitor.getMetrics(webview.getUrl()));
-			return false; // let app handle back button (activity end -> currently, also app termination)
+			return super.onKeyDown(keyCode, event); // let app handle back button (activity end -> currently, also app termination)
 		}
-		if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
+		else if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
 			if (backButtonGloballyAllowed && currentPageBackButtonAllowed) {
 				if (currentPageBackButtonURL != null)
 					try {

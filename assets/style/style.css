@@ -1,1 +1,2 @@
 img {width: 400px; -webkit-tap-highlight-color: rgba(0,0,0,0);}
+.backbuttonadvice, .nobackbutton {visibility: hidden;}

@@ -40,7 +40,10 @@ Usage Instructions
 
 ### Back Button usage:
  * The back button can be enabled or disabled globally (/res/values/settings.xml).
+ * Pressing the back button on the first page (defined in /res/values/settings.xml) results currently in the termination of the app (as expected).
  * If globally enabled, back button support can be switched off per HTML file, by putting "nobackbutton" ANYWHERE in the file. E.g. using a hidden span with a class "nobackbutton" will be fine.
+ * You can set the target of a back button press for the current HTML file by putting in a standard HTML element with CSS class "backbuttonadvice", containing a relative path to the other file.
+	  * Example: A user pressing the back-button on 01-myscreen.html shall be directed to 00-somescreen.html. We do so by putting a span-element into 01-myscreen.html, having the class "backbuttonadvice". The inner content of the span-element is "00-somescreen.html".
 
 Care to Contribute?
 -------------------

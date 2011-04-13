@@ -1,12 +1,10 @@
 package com.manuelmaly.mockingdroid;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,27 +20,33 @@ public class HTML extends Activity {
 
 	WebView webview;
 	WebViewMonitor monitor;
-
+	
+	
+	String startURI = null;
 	boolean backButtonGloballyAllowed;
 	boolean currentPageBackButtonAllowed = true;
 	String currentPageBackButtonURL = null;
 	private Handler mHandler = new Handler();
 
+	private final String TAG = "HTML";
+	public static final String START_PATH = "START_PATH";
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		backButtonGloballyAllowed = getResources().getInteger(R.integer.backbutton_enabled) > 0;
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		String startUrl = getResources().getString(R.string.start_page);
+		startURI = LocalFileContentProvider.constructUri(getIntent().getStringExtra(START_PATH));
 		webview = new WebView(this);
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.setVerticalScrollBarEnabled(false);
 		webview.setHorizontalScrollBarEnabled(false);
 		webview.setPadding(0, 0, 0, 0);
 		webview.addJavascriptInterface(new JavaScriptInterface(), "BACKBUTTONSTATUS");
-		webview.loadUrl(startUrl);
-		this.monitor = new WebViewMonitor(this, startUrl);
+		webview.loadUrl(startURI);
+		this.monitor = new WebViewMonitor(this, startURI);
 		webview.setWebViewClient(this.monitor);
 		setContentView(webview);
 		webview.setInitialScale(getScale());
@@ -61,19 +65,17 @@ public class HTML extends Activity {
 			// on quit application..
 			// getMetrics here...
 			System.out.println("com.manuelmaly.mockingdroid.monitor: " + this.monitor.getMetrics(webview.getUrl()));
-			return super.onKeyDown(keyCode, event); // let app handle back button (activity end -> currently, also app termination)
-		}
-		else if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
+			return super.onKeyDown(keyCode, event); // let app handle back
+													// button (activity end ->
+													// currently, also app
+													// termination)
+		} else if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
 			if (backButtonGloballyAllowed && currentPageBackButtonAllowed) {
-				if (currentPageBackButtonURL != null)
-					try {
-						URL gotoURL = new URL(new URL(webview.getUrl()), currentPageBackButtonURL);
-						Log.i("HTML", "Backbutton-Advice says: go to: " + gotoURL.toString());
-						webview.loadUrl(gotoURL.toString());
-					} catch (MalformedURLException e) {
-						e.printStackTrace();
-					}
-				else {
+				if (currentPageBackButtonURL != null) {
+					String gotoURL = URIHelper.urlForLink(webview.getUrl(), currentPageBackButtonURL).toString();
+					Log.i(TAG, "Backbutton-Advice says: go to: " + gotoURL);
+					webview.loadUrl(gotoURL);
+				} else {
 					webview.goBack();
 				}
 				this.monitor.backButtonPressed(webview.getUrl());
@@ -81,13 +83,13 @@ public class HTML extends Activity {
 			return true;
 		}
 		if ((keyCode == KeyEvent.KEYCODE_MENU)) {
-			URL menuURL = getMenuScreenURL();
+			URI menuURL = URIHelper.getMenuScreenURL(getApplicationContext(), webview.getUrl());
 			if (menuURL != null)
 				webview.loadUrl(menuURL.toString());
 			return true;
 		}
 		if ((keyCode == KeyEvent.KEYCODE_SEARCH)) {
-			URL searchURL = getSearchScreenURL();
+			URI searchURL = URIHelper.getSearchScreenURL(getApplicationContext(), webview.getUrl());
 			if (searchURL != null)
 				webview.loadUrl(searchURL.toString());
 			return true;
@@ -97,8 +99,8 @@ public class HTML extends Activity {
 	}
 
 	private boolean isStartPage() {
-    	return webview.getUrl().equals(getResources().getString(R.string.start_page));
-    }
+		return webview.getUrl().equals(startURI);
+	}
 
 	private class JavaScriptInterface {
 		/**
@@ -115,10 +117,10 @@ public class HTML extends Activity {
 				}
 			});
 		}
-		
+
 		/**
-		 * Gets called by JS within the currently displayed HTML file, to optionally set
-		 * the target file of the next backbutton press.
+		 * Gets called by JS within the currently displayed HTML file, to
+		 * optionally set the target file of the next backbutton press.
 		 * 
 		 * @param status
 		 */
@@ -132,96 +134,6 @@ public class HTML extends Activity {
 		}
 	}
 
-	private URL getMenuScreenURL() {
-		return getSpecialScreenURL(getResources().getString(R.string.filesuffix_menu));
-	}
-
-	private URL getSearchScreenURL() {
-		return getSpecialScreenURL(getResources().getString(R.string.filesuffix_search));
-	}
-
-	/**
-	 * Returns the URL for a special screen file (menu, search,...) belonging to
-	 * the currently displayed file. (e.g. current is "start.html" returns
-	 * "start.menu.html")
-	 * 
-	 * @return String
-	 */
-	private URL getSpecialScreenURL(String suffix) {
-		try {
-			URL cURL = new URL(webview.getUrl());
-			String fileName = cURL.getFile();
-			int dotPos;
-			String menuFileName = null;
-
-			// Is this already a special screen? If yes, return to the original
-			// screen (remove suffixes); if there is a suffix, but it's another
-			// one
-			// (e.g. start.menu.html and suffix ".search" is requested), drop
-			// the old suffix:
-			String suffixMenu = getResources().getString(R.string.filesuffix_menu);
-			String suffixSearch = getResources().getString(R.string.filesuffix_search);
-			String[] suffixesToLookFor = new String[] { suffixMenu, suffixSearch };
-			for (String curSuffix : suffixesToLookFor) {
-				if (fileName.indexOf(curSuffix) > -1) {
-					if (suffix.equals(curSuffix))
-						return createURLWithFilename(cURL, fileName.replace(curSuffix, ""));
-					else
-						fileName = fileName.replace(curSuffix, "");
-				}
-			}
-
-			if ((dotPos = fileName.indexOf(".")) > 0) { // filename.ext
-				String extension = fileName.substring(dotPos);
-				String nameWithoutExt = fileName.substring(0, dotPos);
-				menuFileName = nameWithoutExt + suffix + extension;
-
-			} else { // filename OR .filename
-				menuFileName = fileName + suffix;
-			}
-			URL menuURL = createURLWithFilename(cURL, menuFileName);
-			if (resourceExists(menuURL))
-				return menuURL;
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private URL createURLWithFilename(URL url, String fileName) throws MalformedURLException {
-		return new URL(url.getProtocol(), url.getHost(), url.getPort(), fileName);
-	}
-
-	private boolean resourceExists(URL path) {
-		// File is in asset folder:
-		if (path.toString().indexOf("android_asset/") > -1) {
-			try {
-				getAssets().open(path.getFile().replace("/android_asset/", "")).close();
-				return true;
-			} catch (IOException e1) {
-				return false;
-			}
-		}
-		// File is somewhere different - online? SDCard? - currently, handle
-		// only online:
-		else {
-			return onlineResourceExists(path.toString());
-		}
-	}
-
-	private boolean onlineResourceExists(String URLName) {
-		try {
-			HttpURLConnection.setFollowRedirects(false);
-			// note : you may also need
-			// HttpURLConnection.setInstanceFollowRedirects(false)
-			HttpURLConnection con = (HttpURLConnection) new URL(URLName).openConnection();
-			con.setRequestMethod("HEAD");
-			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
 
 	private int getScale() {
 		Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
@@ -232,4 +144,5 @@ public class HTML extends Activity {
 		val = val * 100d;
 		return val.intValue();
 	}
+
 }

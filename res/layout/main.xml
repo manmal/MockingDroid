@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
-</LinearLayout>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="vertical">
+	<Button android:id="@+id/selectStartFile" android:layout_width="150dip"
+		android:layout_height="70dip" android:text="Select Start"
+		android:layout_centerHorizontal="true" android:layout_centerVertical="true"
+		android:textSize="20sp" android:textStyle="bold" />
+</RelativeLayout>

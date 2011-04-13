@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import com.manuelmaly.mockingdroid.monitor.WebViewMonitor;
 
@@ -20,13 +21,16 @@ public class HTML extends Activity {
 
 	WebView webview;
 	WebViewMonitor monitor;
-	
-	
+
 	String startURI = null;
 	boolean backButtonGloballyAllowed;
 	boolean currentPageBackButtonAllowed = true;
 	String currentPageBackButtonURL = null;
 	private Handler mHandler = new Handler();
+
+	// Only used for backbutton presses:
+	long lastBackPressTime = 0;
+	Toast backToast;
 
 	private final String TAG = "HTML";
 	public static final String START_PATH = "START_PATH";
@@ -65,10 +69,17 @@ public class HTML extends Activity {
 			// on quit application..
 			// getMetrics here...
 			System.out.println("com.manuelmaly.mockingdroid.monitor: " + this.monitor.getMetrics(webview.getUrl()));
-			return super.onKeyDown(keyCode, event); // let app handle back
-													// button (activity end ->
-													// currently, also app
-													// termination)
+
+			if (this.lastBackPressTime < System.currentTimeMillis() - 2000) {
+				backToast = Toast.makeText(this, "Press back again to end this session!", Toast.LENGTH_SHORT);
+				backToast.show();
+				this.lastBackPressTime = System.currentTimeMillis();
+				return true;
+			} else {
+				if (backToast != null)
+					backToast.cancel();
+				return super.onKeyDown(keyCode, event); // let app handle back button (activity end)
+			}
 		} else if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
 			if (backButtonGloballyAllowed && currentPageBackButtonAllowed) {
 				if (currentPageBackButtonURL != null) {
@@ -133,7 +144,6 @@ public class HTML extends Activity {
 			});
 		}
 	}
-
 
 	private int getScale() {
 		Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();

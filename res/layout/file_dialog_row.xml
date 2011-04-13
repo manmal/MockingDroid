@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="wrap_content" android:padding="5dp">
+	android:layout_width="fill_parent" android:layout_height="wrap_content" android:padding="5dp" android:background="@color/file_dialog_item">
 
 	<ImageView android:layout_alignParentLeft="true" android:id="@+id/fdrowimage"
 		android:layout_height="35dp" android:layout_width="wrap_content"
@@ -10,6 +10,6 @@
 		android:id="@+id/fdrowtext" android:layout_toRightOf="@+id/fdrowimage"
 		android:layout_alignTop="@+id/fdrowimage" android:layout_alignBottom="@+id/fdrowimage"
 		android:gravity="center_vertical" android:layout_height="50dp"
-		android:textSize="23dp"></TextView> 
+		android:textSize="23dp" android:textColor="#ffffff"></TextView> 
 
 </RelativeLayout>

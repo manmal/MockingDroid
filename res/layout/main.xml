@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:orientation="vertical">
-	<Button android:id="@+id/selectStartFile" android:layout_width="150dip"
-		android:layout_height="70dip" android:text="Select Start"
-		android:layout_centerHorizontal="true" android:layout_centerVertical="true"
-		android:textSize="20sp" android:textStyle="bold" />
-</RelativeLayout>
+	android:orientation="vertical" android:padding="20dp">
+	<TextView android:id="@+id/lblStartPage" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:textSize="14sp"
+		android:text="Start page:" android:layout_marginBottom="5dp"/>
+	<TextView android:id="@+id/txtStartPage" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:textSize="18sp"
+		android:text="Tap to define..." android:background="@drawable/txtfield_filepath"
+		android:clickable="true" android:textColor="@color/mainbg" android:padding="10dp"/>
+	<Button android:id="@+id/btnStartMockup" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:textSize="24sp" android:text="Start Session"
+		android:background="@drawable/btn_startmock" android:padding="15dp" android:layout_marginTop="60dp"
+		android:textColor="#ffffff"/>
+</LinearLayout>

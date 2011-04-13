@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="mainbg">#e3ddcd</color>
+	<color name="filechoose_selectfield">#a49f94</color>
+	<color name="filechoose_item_selected">#a49f94</color>
+	<color name="filechoose_listbg">#676256</color>
+</resources>

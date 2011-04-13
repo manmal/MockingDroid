@@ -1,5 +1,6 @@
 package com.manuelmaly.mockingdroid;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -7,13 +8,18 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
+import android.os.RemoteException;
 
 public class URIHelper {
 
 	public static URI urlForLink(String originalUrl, String link) {
 		try {
-			 // originalUrl is HTTP or asset; link is either absolute or relative:
+			// originalUrl is HTTP or asset; link is either absolute or
+			// relative:
 			if (isURLCompatible(originalUrl))
 				// this can handle both absolute and relative HTTP or asset
 				// links:
@@ -24,12 +30,14 @@ public class URIHelper {
 				if (isURLCompatible(link))
 					return new URI(link);
 				// link seems to be relative and on sd-card
-				else { 
+				else {
 					StringBuilder sb = new StringBuilder(originalUrl.substring(0, originalUrl.lastIndexOf("/")));
 					String linkFileName = null;
-					if (link.lastIndexOf("/") > -1) // link has at least one dir component
-						linkFileName = link.substring(link.lastIndexOf("/")+1);
-					else // link consists only of filename
+					if (link.lastIndexOf("/") > -1) // link has at least one dir
+													// component
+						linkFileName = link.substring(link.lastIndexOf("/") + 1);
+					else
+						// link consists only of filename
 						linkFileName = link;
 					return new URI(sb.append("/").append(linkFileName).toString());
 				}
@@ -55,7 +63,7 @@ public class URIHelper {
 			return false;
 		}
 	}
-	
+
 	public static String getFileNameForURI(String uri) {
 		URI parseduri;
 		try {
@@ -66,7 +74,7 @@ public class URIHelper {
 			return uri;
 		}
 	}
-	
+
 	public static URI getMenuScreenURL(Context context, String originalUrl) {
 		return getSpecialScreenURL(context, originalUrl, context.getResources().getString(R.string.filesuffix_menu));
 	}
@@ -74,7 +82,7 @@ public class URIHelper {
 	public static URI getSearchScreenURL(Context context, String originalUrl) {
 		return getSpecialScreenURL(context, originalUrl, context.getResources().getString(R.string.filesuffix_search));
 	}
-	
+
 	/**
 	 * Returns the URL for a special screen file (menu, search,...) belonging to
 	 * the currently displayed file. (e.g. current is "start.html" returns
@@ -121,6 +129,13 @@ public class URIHelper {
 	public static boolean resourceExists(Context context, URI path) {
 		// File is on SD-card:
 		if (path.toString().indexOf("com.manuelmaly.localfile") > -1) {
+			ContentResolver cr = context.getContentResolver();
+			ContentProviderClient cpc = cr.acquireContentProviderClient("com.manuelmaly.localfile");
+			try {
+				cpc.openFile(Uri.parse(path.toString()), null);
+			} catch (Exception e) {
+				return false;
+			}
 			return true;
 		}
 
@@ -154,5 +169,5 @@ public class URIHelper {
 			return false;
 		}
 	}
-	
+
 }

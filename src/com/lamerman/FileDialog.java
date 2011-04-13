@@ -10,13 +10,10 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -37,116 +34,38 @@ public class FileDialog extends ListActivity {
 	private List<String> path = null;
 	private String root = "/";
 	private TextView myPath;
-	private EditText mFileName;
 	private ArrayList<HashMap<String, Object>> mList;
 
-	private Button selectButton;
-	private Button newButton;
-	private Button cancelButton;
-	private Button createButton;
-
-	private LinearLayout layoutSelect;
-	private LinearLayout layoutCreate;
-	private InputMethodManager inputManager;
 	private String parentPath;
 	private String currentPath = root;
 
-	private File selectedFile;
 	private HashMap<String, Integer> lastPositions = new HashMap<String, Integer>();
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setTitle("Choose the Start Page and tap onto it");
 		setResult(RESULT_CANCELED, getIntent());
-
 		setContentView(R.layout.file_dialog_main);
 		myPath = (TextView) findViewById(R.id.path);
-		mFileName = (EditText) findViewById(R.id.fdEditTextFile);
-
-		inputManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-
-		selectButton = (Button) findViewById(R.id.fdButtonSelect);
-		selectButton.setEnabled(false);
-		selectButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (selectedFile != null) {
-					getIntent().putExtra(RESULT_PATH, selectedFile.getPath());
-					setResult(RESULT_OK, getIntent());
-					finish();
-				}
-			}
-		});
-
-		newButton = (Button) findViewById(R.id.fdButtonNew);
-		newButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				layoutSelect.setVisibility(View.GONE);
-				layoutCreate.setVisibility(View.VISIBLE);
-
-				mFileName.setText("");
-				mFileName.requestFocus();
-			}
-		});
-
-		layoutSelect = (LinearLayout) findViewById(R.id.fdLinearLayoutSelect);
-		layoutCreate = (LinearLayout) findViewById(R.id.fdLinearLayoutCreate);
-		layoutCreate.setVisibility(View.GONE);
-
-		cancelButton = (Button) findViewById(R.id.fdButtonCancel);
-		cancelButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				layoutCreate.setVisibility(View.GONE);
-				layoutSelect.setVisibility(View.VISIBLE);
-
-				inputManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
-				unselect();
-			}
-
-		});
-		createButton = (Button) findViewById(R.id.fdButtonCreate);
-		createButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (mFileName.getText().length() > 0) {
-					getIntent().putExtra(RESULT_PATH, currentPath + "/" + mFileName.getText());
-					setResult(RESULT_OK, getIntent());
-					finish();
-				}
-			}
-		});
 
 		String startPath = getIntent().getStringExtra(START_PATH);
-		if (startPath != null) {
+		if (startPath != null)
 			getDir(startPath);
-		} else {
+		else
 			getDir(root);
-		}
 	}
 
 	private void getDir(String dirPath) {
-
 		boolean useAutoSelection = dirPath.length() < currentPath.length();
-
 		Integer position = lastPositions.get(parentPath);
-
 		getDirImpl(dirPath);
-
-		if (position != null && useAutoSelection) {
+		if (position != null && useAutoSelection)
 			getListView().setSelection(position);
-		}
-
 	}
 
 	private void getDirImpl(String dirPath) {
-
 		myPath.setText(getText(R.string.location) + ": " + dirPath);
 		currentPath = dirPath;
 
@@ -158,22 +77,20 @@ public class FileDialog extends ListActivity {
 		File[] files = f.listFiles();
 
 		if (!dirPath.equals(root)) {
-
 			item.add(root);
 			addItem(root, R.drawable.folder);
 			path.add(root);
-
 			item.add("../");
 			addItem("../", R.drawable.folder);
 			path.add(f.getParent());
 			parentPath = f.getParent();
-
 		}
 
 		TreeMap<String, String> dirsMap = new TreeMap<String, String>();
 		TreeMap<String, String> dirsPathMap = new TreeMap<String, String>();
 		TreeMap<String, String> filesMap = new TreeMap<String, String>();
 		TreeMap<String, String> filesPathMap = new TreeMap<String, String>();
+
 		for (File file : files) {
 			if (file.isDirectory()) {
 				String dirName = file.getName();
@@ -191,19 +108,14 @@ public class FileDialog extends ListActivity {
 
 		SimpleAdapter fileList = new SimpleAdapter(this, mList, R.layout.file_dialog_row, new String[] { ITEM_KEY,
 				ITEM_IMAGE }, new int[] { R.id.fdrowtext, R.id.fdrowimage });
-
 		for (String dir : dirsMap.tailMap("").values()) {
 			addItem(dir, R.drawable.folder);
 		}
-
 		for (String file : filesMap.tailMap("").values()) {
 			addItem(file, R.drawable.file);
 		}
-
 		fileList.notifyDataSetChanged();
-
 		setListAdapter(fileList);
-
 	}
 
 	private void addItem(String fileName, int imageId) {
@@ -215,11 +127,8 @@ public class FileDialog extends ListActivity {
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-
 		File file = new File(path.get(position));
-
 		if (file.isDirectory()) {
-			unselect();
 			if (file.canRead()) {
 				lastPositions.put(currentPath, position);
 				getDir(path.get(position));
@@ -239,9 +148,10 @@ public class FileDialog extends ListActivity {
 			if (fileName.lastIndexOf(".") >= 0) {
 				String fileExt = fileName.substring(fileName.lastIndexOf("."));
 				if (fileExt.equals(".html") || fileExt.equals(".htm")) {
-					selectedFile = file;
+					getIntent().putExtra(RESULT_PATH, file.getPath());
+					setResult(RESULT_OK, getIntent());
+					finish();
 					v.setSelected(true);
-					selectButton.setEnabled(true);
 				} else
 					wrongFileTypeError();
 			} else
@@ -250,33 +160,22 @@ public class FileDialog extends ListActivity {
 	}
 
 	public void wrongFileTypeError() {
-		Toast.makeText(getApplicationContext(), "You have to select a .htm or .html file for your mockup!",
+		Toast.makeText(getApplicationContext(), "You have to select a .htm or .html file for your Start Page!",
 				Toast.LENGTH_LONG).show();
 	}
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-			unselect();
-
-			if (layoutCreate.getVisibility() == View.VISIBLE) {
-				layoutCreate.setVisibility(View.GONE);
-				layoutSelect.setVisibility(View.VISIBLE);
+			if (!currentPath.equals(root)) {
+				getDir(parentPath);
 			} else {
-				if (!currentPath.equals(root)) {
-					getDir(parentPath);
-				} else {
-					return super.onKeyDown(keyCode, event);
-				}
+				return super.onKeyDown(keyCode, event);
 			}
-
 			return true;
 		} else {
 			return super.onKeyDown(keyCode, event);
 		}
 	}
 
-	private void unselect() {
-		selectButton.setEnabled(false);
-	}
 }

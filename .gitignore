@@ -3,4 +3,5 @@
 /gen
 /assets
 .settings/
+.svn/
 .DS_Store

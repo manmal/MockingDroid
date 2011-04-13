@@ -10,6 +10,6 @@
 		android:id="@+id/fdrowtext" android:layout_toRightOf="@+id/fdrowimage"
 		android:layout_alignTop="@+id/fdrowimage" android:layout_alignBottom="@+id/fdrowimage"
 		android:gravity="center_vertical" android:layout_height="50dp"
-		android:textSize="23dp" android:textColor="#ffffff"></TextView> 
+		android:textSize="18dp" android:textColor="#ffffff"></TextView> 
 
 </RelativeLayout>
